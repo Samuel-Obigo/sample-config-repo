@@ -1,0 +1,44 @@
+# application-local.yml
+
+# 각 Profile의 변수
+variable:
+  # persistence profile
+  datasource: # database 접속 정보
+    jdbc-url: jdbc:postgresql://localhost:5432/sample?currentSchema=auth,sample,public
+    username: sample
+    password: sample
+  jpa: # JPA DDL AUTO 정보
+    ddl-auto: update
+
+  # eureka-client profile
+  eureka:
+    client:
+      service-url:
+        defaultZone: http://localhost:8761/eureka
+    instance:
+      hostname: localhost  # 해당 서비스의 hostname
+
+  jwt:
+    issuer-uri: http://localhost:${variable.jwt.issuer-uri-port}/auth
+---
+spring:
+  config:
+    activate:
+      on-profile: "local & !gateway"  # Standalone
+
+# 각 Profile의 변수
+variable:
+  jwt:
+    issuer-uri-port: 9000
+---
+spring:
+  config:
+    activate:
+      on-profile: "local & gateway"
+
+# 각 Profile의 변수
+variable:
+  jwt:
+    issuer-uri-port: 8000
+
+
