@@ -13,7 +13,7 @@ variable:
   app:
     issuer:
       port: 9000
-      url: http://localhost:${variable.app.issuer.port}/auth
+      uri: http://localhost:${variable.app.issuer.port}/auth
 ---
 spring:
   config:
