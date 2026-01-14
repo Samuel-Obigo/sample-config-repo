@@ -23,13 +23,13 @@ variable:
                 client-id: auth-bff-client
                 client-secret: auth-bff-secret
   app:
-    auth: # 인증 서버 정보
+    auth:
       port: 9000
       base-url: http://localhost:${variable.app.auth.port}/auth
-    resource: # 리소스 서버 정보
+    resource:
       port: 8081
       base-url: http://localhost:${variable.app.resource.port}/api
-    front: # Auth Front 서버 정보
+    front:
       port: 5173
       base-url: http://localhost:${variable.app.front.port}/authf/
 ---
@@ -42,11 +42,11 @@ variable:
   app:
     gateway:
       port: 8000
-    auth: # 인증 서버 정보
+    auth:
       port: ${variable.app.gateway.port}
-    resource: # 리소스 서버 정보
+    resource:
       port: ${variable.app.gateway.port}
-    front: # Auth Front 서버 정보
+    front:
       port: ${variable.app.gateway.port}
 ---
 spring:
