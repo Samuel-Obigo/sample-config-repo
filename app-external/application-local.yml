@@ -4,49 +4,49 @@ server:
   servlet:
     session:
       cookie:
-        name: EXTERNAL_JSESSIONID # local일 경우 사용(localhost로 여러개의 서버가 실행 될 경우 세션이 꼬임)
-
+        path: /
+        http-only: true
+        same-site: Lax   # (gateway/외부 도메인 섞이면 None+Secure 고려)
+        secure: false    # https면 true
   error:
     include-message: always
     include-stacktrace: always
 
-# 각 Profile의 변수
 variable:
-  # eureka-client profile
-  eureka:
-    client:
-      service-url:
-        defaultZone: http://localhost:8761/eureka
-    instance:
-      hostname: sample.local  # 해당 서비스의 hostname
-
-  # 인증서버의 OAuth2 정보
-  auth:
-    client-id: ext-client
-    client-secret: ext-secret
-    scope: resource.read resource.write
+  app:
+    security:
+      client-id: ext-client
+      client-secret: ext-secret
+      scope: resource.read resource.write
+    auth:
+      port: 9000
+      base-url: http://localhost:${variable.app.auth.port}/auth
+    resource:
+      port: 8090
+      base-url: http://localhost:${variable.app.resource.port}/api
 ---
 spring:
   config:
     activate:
-      on-profile: "local & !gateway"  # Standalone
+      on-profile: gateway
 
-# 각 Profile의 변수
 variable:
-  auth:
-    base-url: http://localhost:9000/auth
-  resource:
-    base-url: http://localhost:8090/api
-
+  app:
+    gateway:
+      port: 8000
+    auth:
+      port: ${variable.app.gateway.port}
+    resource:
+      port: ${variable.app.gateway.port}
 ---
 spring:
   config:
     activate:
-      on-profile: "local & gateway"
+      on-profile: web
 
-# 각 Profile의 변수
 variable:
-  auth:
-    base-url: http://sample.local:8000/auth
-  resource:
-    base-url: http://sample.local:8000/api
+  web:
+    # web > redis profile
+    redis:
+      host: localhost
+      port: 6379

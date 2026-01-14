@@ -1,44 +1,53 @@
 # application-local.yml
 
-# 각 Profile의 변수
+server:
+  servlet:
+    session:
+      cookie:
+        path: /
+        http-only: true
+        same-site: Lax   # (gateway/외부 도메인 섞이면 None+Secure 고려)
+        secure: false    # https면 true
+
 variable:
-  # persistence profile
-  datasource: # database 접속 정보
+  app:
+    issuer:
+      port: 9000
+      url: http://localhost:${variable.app.issuer.port}/auth
+---
+spring:
+  config:
+    activate:
+      on-profile: gateway
+
+variable:
+  app:
+    gateway:
+      port: 8000
+    issuer:
+      port: ${variable.app.gateway.port}
+---
+spring:
+  config:
+    activate:
+      on-profile: persistence
+
+variable:
+  datasource:
     jdbc-url: jdbc:postgresql://localhost:5432/sample?currentSchema=auth,sample,public
     username: sample
     password: sample
-  jpa: # JPA DDL AUTO 정보
+  jpa:
     ddl-auto: update
-
-  # eureka-client profile
-  eureka:
-    client:
-      service-url:
-        defaultZone: http://localhost:8761/eureka
-    instance:
-      hostname: localhost  # 해당 서비스의 hostname
-
-  jwt:
-    issuer-uri: http://localhost:${variable.jwt.issuer-uri-port}/auth
 ---
 spring:
   config:
     activate:
-      on-profile: "local & !gateway"  # Standalone
+      on-profile: web
 
-# 각 Profile의 변수
 variable:
-  jwt:
-    issuer-uri-port: 9000
----
-spring:
-  config:
-    activate:
-      on-profile: "local & gateway"
-
-# 각 Profile의 변수
-variable:
-  jwt:
-    issuer-uri-port: 8000
-
-
+  web:
+    # web > redis profile
+    redis:
+      host: localhost
+      port: 6379

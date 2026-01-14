@@ -4,64 +4,59 @@ server:
   servlet:
     session:
       cookie:
-        name: AUTH_BFF_JSESSIONID # local일 경우 사용(localhost로 여러개의 서버가 실행 될 경우 세션이 꼬임)
         path: /
         http-only: true
+        same-site: Lax   # (gateway/외부 도메인 섞이면 None+Secure 고려)
+        secure: false    # https면 true
   error:
     include-message: always
     include-stacktrace: always
 
-# 각 Profile의 변수
 variable:
-  # eureka-client profile
-  eureka:
-    client:
-      service-url:
-        defaultZone: http://localhost:8761/eureka
-    instance:
-      hostname: localhost  # 해당 서비스의 hostname
-
-  # 인증서버의 OAuth2 정보
-  security:
-    oauth2:
-      client:
-        provider:
-          registration:
-            bff-client:
-              client-id: auth-bff-client
-              client-secret: auth-bff-secret
-
-  auth: # 인증 서버 정보
-    base-url: http://localhost:${variable.auth.port}/auth
-  resource: # 리소스 서버 정보
-    base-url: http://localhost:${variable.resource.port}/api
-  front: # Auth Front 서버 정보
-    base-url: http://localhost:${variable.front.port}/authf/
+  spring:
+    security:
+      oauth2:
+        client:
+          provider:
+            registration:
+              bff-client:
+                client-id: auth-bff-client
+                client-secret: auth-bff-secret
+  app:
+    auth: # 인증 서버 정보
+      port: 9000
+      base-url: http://localhost:${variable.app.auth.port}/auth
+    resource: # 리소스 서버 정보
+      port: 8081
+      base-url: http://localhost:${variable.app.resource.port}/api
+    front: # Auth Front 서버 정보
+      port: 5173
+      base-url: http://localhost:${variable.app.front.port}/authf/
 ---
 spring:
   config:
     activate:
-      on-profile: "local & !gateway"  # Standalone
+      on-profile: gateway
 
-# 각 Profile의 변수
 variable:
-  auth: # 인증 서버 정보
-    port: 9000
-  resource: # 리소스 서버 정보
-    port: 8081
-  front: # Auth Front 서버 정보
-    port: 5173
+  app:
+    gateway:
+      port: 8000
+    auth: # 인증 서버 정보
+      port: ${variable.app.gateway.port}
+    resource: # 리소스 서버 정보
+      port: ${variable.app.gateway.port}
+    front: # Auth Front 서버 정보
+      port: ${variable.app.gateway.port}
 ---
 spring:
   config:
     activate:
-      on-profile: "local & gateway"
+      on-profile: web
 
-# 각 Profile의 변수
 variable:
-  auth: # 인증 서버 정보
-    port: 8000
-  resource: # 리소스 서버 정보
-    port: 8000
-  front: # Auth Front 서버 정보
-    port: 8000
+  web:
+    # web > redis profile
+    redis:
+      host: localhost
+      port: 6379
