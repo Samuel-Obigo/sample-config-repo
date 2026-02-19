@@ -14,6 +14,20 @@ variable:
     issuer:
       port: 9000
       uri: http://localhost:${variable.app.issuer.port}/auth
+
+  # persistence-starter
+  datasource:
+    jdbc-url: jdbc:postgresql://localhost:5432/sample?currentSchema=oauth2,admin,sample,public
+    username: sample
+    password: sample
+  jpa:
+    ddl-auto: update
+
+  # kafka-stater
+  kafka:
+    boostrap-servers: localhost:9092
+    consumer:
+      group-id: resource-group
 ---
 spring:
   config:
@@ -26,19 +40,6 @@ variable:
       port: 8000
     issuer:
       port: ${variable.app.gateway.port}
----
-spring:
-  config:
-    activate:
-      on-profile: persistence
-
-variable:
-  datasource:
-    jdbc-url: jdbc:postgresql://localhost:5432/sample?currentSchema=auth,sample,public
-    username: sample
-    password: sample
-  jpa:
-    ddl-auto: update
 ---
 spring:
   config:

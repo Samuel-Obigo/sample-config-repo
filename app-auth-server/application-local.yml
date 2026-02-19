@@ -28,6 +28,20 @@ variable:
     default-success:
       port: 9001
       base-url: http://localhost:${variable.app.default-success.port}/authb
+
+  # persistence-starter
+  datasource:
+    jdbc-url: jdbc:postgresql://localhost:5432/sample?currentSchema=oauth2,admin,sample,public
+    username: sample
+    password: sample
+  jpa:
+    ddl-auto: update
+
+  # kafka-starter
+  kafka:
+    boostrap-servers: localhost:9092
+    consumer:
+      group-id: auth-group
 ---
 spring:
   config:
@@ -42,19 +56,6 @@ variable:
       port: ${variable.app.gateway.port}
     default-success:
       port: ${variable.app.gateway.port}
----
-spring:
-  config:
-    activate:
-      on-profile: persistence
-
-variable:
-  datasource:
-    jdbc-url: jdbc:postgresql://localhost:5432/sample?currentSchema=auth,sample,public
-    username: sample
-    password: sample
-  jpa:
-    ddl-auto: update
 ---
 spring:
   config:
